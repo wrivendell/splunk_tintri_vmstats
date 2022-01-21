@@ -1,0 +1,16 @@
+[2022-01-18T14:20:14] 0428-2108-147 [a] Obtaining BASIC Appliance info --> v310/appliance/default/info
+{
+    currentCapacityGiB: 30004.499574548565
+    expansionSupported: true
+    filesystemId: c2d4435a-ef7a-13f0-8f4c-b6cd88a510d3
+    isAdminPasswordSyncRequired: false
+    isAllFlash: true
+    isExpandable: false
+    isFipsEncryptionEnabled: false
+    modelName: T7080
+    osVersion: 5.2.0.1-11342.55846.24813
+    outOfBoxCompleted: true
+    productId: ZC5
+    serialNumber: 0428-2108-147
+    typeId: com.tintri.api.rest.v310.dto.domain.beans.hardware.ApplianceInfo
+}
