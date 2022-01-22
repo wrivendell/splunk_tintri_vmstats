@@ -29,10 +29,10 @@ def time_stamp() -> str:
 	return(time_stamp)
 
 # log in to the Tintri VMStore device (validate credentials)
-def login_to_vmstore(server_name:str) -> str:
+def login_to_vmstore(server_name:str) -> tuple:
 	'''
 	This will attempt to create a login session to the Tintri device.
-	The return will be a session_id from the cookies entry in the response.
+	The return will be a session_id from the cookies entry in the response and a True/False as second entry in tuple of login status.
 	'''
 	# TNTRI - VMStore Login Info - Payload, header and URL for login call
 	headers =   {'content-type': 'application/json'}
@@ -61,24 +61,24 @@ def login_to_vmstore(server_name:str) -> str:
 	except requests.ConnectionError:
 		log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Tintri Login ERROR: API Connection error occurred"])
 		print("TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Tintri Login ERROR: API Connection error occurred")
-		sys.exit()
+		return('', False)
 	except requests.HTTPError:
 		log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Tintri Login ERROR: HTTP error occurred"])
 		print("TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Tintri Login ERROR: HTTP error occurred")
-		sys.exit()
+		return('', False)
 	except requests.Timeout:
 		log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Tintri Login ERROR: Request timed out"])
 		print("TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Tintri Login ERROR: Request timed out")
-		sys.exit()
+		return('', False)
 	except Exception:
 		log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Tintri Login ERROR: An unexpected error occurred"])
 		print("TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Tintri Login ERROR: An unexpected error occurred")
-		sys.exit()
+		return('', False)
 	# if http Response is not 200 then raise an exception and exit
 	if not r.status_code == 200:
 		log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Tintri Login ERROR: HTTP Status code is not 200, exiting on: " + str(r.status_code)])
 		print("TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Tintri Login ERROR: HTTP Status code is not 200, exiting on: " + str(r.status_code))
-		sys.exit()
+		return('', False)
 
 	# success
 	if arguments.args.debug:
@@ -89,7 +89,10 @@ def login_to_vmstore(server_name:str) -> str:
 	log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"): The HTTP Status code is: " + str(r.status_code)])
 	
 	# Return SessionId from Cookie
-	return(r.cookies['JSESSIONID'])
+	if r.cookies:
+		return(r.cookies['JSESSIONID'], True)
+	else:
+		return('', False)
 
 # get the Tintri Device Info
 def get_device_info(session_id:str, server_name:str):
@@ -119,11 +122,11 @@ def get_device_info(session_id:str, server_name:str):
 		if not r.status_code == 200:
 			log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Tintri get_device_info ERROR: HTTP Status code is not 200 on Device Info API, exiting on: " + str(r.status_code)])
 			print("TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Tintri get_device_info ERROR: HTTP Status code is not 200 on Device Info API, exiting on: " + str(r.status_code))
-			sys.exit()
+			return(r.text, False)
 	except Exception:
 		log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Tintri get_device_info ERROR: An unexpected error occurred trying to get Device Info from API, exiting."])
 		print("TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Tintri get_device_info ERROR: An unexpected error occurred trying to get Device Info from API, exiting.")
-		sys.exit()
+		return(r.text, False)
 
 	# success
 	if arguments.args.debug:
@@ -131,7 +134,7 @@ def get_device_info(session_id:str, server_name:str):
 		print("TINTRI_TA(" + str(sys._getframe().f_lineno) +"): The Json response of login call to the server: " + server_name + " is: \n" + r.text + "\n\n")
 	log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"): The HTTP Status code is: " + str(r.status_code)])
 
-	return(r.text)
+	return(r.text, True)
 
 # get the Tintri VMStats from vmstats api
 def get_vmstats(session_id:str, server_name:str):
@@ -141,7 +144,11 @@ def get_vmstats(session_id:str, server_name:str):
 	The returned dictionary has one key and one value, the key is the device server name, the value is the combined dict data
 	'''
 	# Get device info details first
-	device_details = json.loads(get_device_info(session_id, server_name))
+	device_details_tuple = json.loads(get_device_info(session_id, server_name))
+	if device_details_tuple[1]:
+		device_details = device_details_tuple[0]
+	else:
+		return('', False)
 
 	# Header and URL for vmstats call
 	headers = {'content-type': 'application/json','cookie': 'JSESSIONID=' + session_id}
@@ -166,11 +173,11 @@ def get_vmstats(session_id:str, server_name:str):
 		if not r.status_code == 200:
 			log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Tintri get_vmstats ERROR: HTTP Status code is not 200 on VMStats Summary API, exiting on: " + str(r.status_code)])
 			print("TINTRI_TA(" + str(sys._getframe().f_lineno) +"):  Tintri get_vmstats ERROR: HTTP Status code is not 200 on VMStats Summary API, exiting on: " + str(r.status_code))
-			sys.exit()
+			return('', False)
 	except Exception:
 		log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"):  Tintri get_vmstats ERROR: An unexpected error occurred trying to get VMStats Summary from API, exiting."])
 		print("TINTRI_TA(" + str(sys._getframe().f_lineno) +"):  Tintri get_vmstats ERROR: An unexpected error occurred trying to get VMStats Summary from API, exiting.")
-		sys.exit()
+		return('', False)
 
 	# success
 	if arguments.args.debug:
@@ -183,7 +190,7 @@ def get_vmstats(session_id:str, server_name:str):
 	vmstats_info = json.loads(r.text) # store vmstats info in dict
 	vmstats_info.update(device_details) # add device info to vmstats info dict
 	tmp_dict[server_name]=vmstats_info # add the server name identifier to make a 1 kv pair dict for return
-	return(tmp_dict)
+	return(tmp_dict, True)
 
 # parse the vmstats data for input to Splunk and optional CSV output
 def parse_vmstats(vmstats:dict) -> dict:
@@ -374,6 +381,7 @@ def send_to_splunk_hec(splunk_events_list:list):
 
 		r = requests.post(arguments.args.splunk_uri + '/services/collector', headers=headers, data=final, verify=False)
 		print("tintri_ta_upload_to_splunk_status_code:" + str(r.status_code)) # in non-debug mode this will get sent to Splunk log - formatted as such
+		print("\n")
 		log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Upload to Splunk Status: " + str(r.status_code)])
 
 ### Runtime ########################################### >>
@@ -383,11 +391,37 @@ def send_to_splunk_hec(splunk_events_list:list):
 for device in arguments.args.server_names:
 	# log into Tintri device and get session_id
 	tintri_session_id = login_to_vmstore(device)
-	vmstats_raw_json.append(get_vmstats(tintri_session_id, device))
+	if tintri_session_id[1]:
+		vmstats_tmp = get_vmstats(tintri_session_id[0], device)
+		if vmstats_tmp[1]:
+			vmstats_raw_json.append(vmstats_tmp[0])
+		else:
+			if arguments.args.debug:
+				print("TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Get Device Info Failed for device: " + device + " ...skipping this one.\n" )
+			print("tintri_ta_device_info_" + device + ":failed") # in non-debug mode this will get sent to Splunk log - formatted as such
+			print("\n")
+			log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Get Device Info for : " + device + ": FAILED "])	
+	else:
+		if arguments.args.debug:
+			print("TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Login failed for device: " + device + " ...skipping this one.\n" )
+		print("tintri_ta_login_" + device + ":failed") # in non-debug mode this will get sent to Splunk log - formatted as such
+		print("\n")
+		log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Tintri Device Login for " + device + ": FAILED "])
 
 # parse each json return into splunk friendly json and add to list
-for vmstat in vmstats_raw_json:
-	splunk_events_list.append(parse_vmstats(vmstat))
+if vmstats_raw_json:
+	for vmstat in vmstats_raw_json:
+		vmstat_raw_tmp = parse_vmstats(vmstat)
+		if vmstat_raw_tmp:
+			if not arguments.args.csv_only:
+				splunk_events_list.append(vmstat_raw_tmp)
+		else:
+			if not arguments.args.csv_only:
+				if arguments.args.debug:
+					print("TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Failed to parse device stats for: " + device + " ...skipping this one.\n" )
+				print("tintri_ta_parse_stats_" + device + ":failed") # in non-debug mode this will get sent to Splunk log - formatted as such
+				print("\n")
+				log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Failed to parse device stats for: " + device + ": FAILED "])			
 
 # send event list to Splunk via HEC
 if splunk_events_list:
