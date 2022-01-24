@@ -144,9 +144,9 @@ def get_vmstats(session_id:str, server_name:str):
 	The returned dictionary has one key and one value, the key is the device server name, the value is the combined dict data
 	'''
 	# Get device info details first
-	device_details_tuple = json.loads(get_device_info(session_id, server_name))
+	device_details_tuple = get_device_info(session_id, server_name)
 	if device_details_tuple[1]:
-		device_details = device_details_tuple[0]
+		device_details = json.loads(device_details_tuple[0])
 	else:
 		return('', False)
 
@@ -392,9 +392,19 @@ for device in arguments.args.server_names:
 	# log into Tintri device and get session_id
 	tintri_session_id = login_to_vmstore(device)
 	if tintri_session_id[1]:
+		if arguments.args.debug:
+			print("TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Login succeeded for device: " + device)
+		print("tintri_ta_login_" + device + ":success") # in non-debug mode this will get sent to Splunk log - formatted as such
+		print("\n")
+		log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Tintri Device Login for " + device + ": SUCCESS "])
 		vmstats_tmp = get_vmstats(tintri_session_id[0], device)
 		if vmstats_tmp[1]:
 			vmstats_raw_json.append(vmstats_tmp[0])
+			if arguments.args.debug:
+				print("TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Get Device Info succeeded for device: " + device)
+			print("tintri_ta_device_info_" + device + ":success") # in non-debug mode this will get sent to Splunk log - formatted as such
+			print("\n")
+			log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Get Device Info for : " + device + ": SUCCESS "])	
 		else:
 			if arguments.args.debug:
 				print("TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Get Device Info Failed for device: " + device + " ...skipping this one.\n" )
@@ -415,13 +425,18 @@ if vmstats_raw_json:
 		if vmstat_raw_tmp:
 			if not arguments.args.csv_only:
 				splunk_events_list.append(vmstat_raw_tmp)
+				if arguments.args.debug:
+					print("TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Succeeded in parsing device stats for: " + device + ".\n" )
+				print("tintri_ta_parse_stats_" + device + ":success") # in non-debug mode this will get sent to Splunk log - formatted as such
+				print("\n")
+				log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Succeeded in parsing device stats for: " + device])	
 		else:
 			if not arguments.args.csv_only:
 				if arguments.args.debug:
 					print("TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Failed to parse device stats for: " + device + " ...skipping this one.\n" )
 				print("tintri_ta_parse_stats_" + device + ":failed") # in non-debug mode this will get sent to Splunk log - formatted as such
 				print("\n")
-				log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Failed to parse device stats for: " + device + ": FAILED "])			
+				log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Failed to parse device stats for: " + device])			
 
 # send event list to Splunk via HEC
 if splunk_events_list:
