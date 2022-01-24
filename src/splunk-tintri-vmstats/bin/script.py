@@ -215,18 +215,18 @@ def parse_vmstats(vmstats:dict) -> dict:
 	serial_number = str(vmstats_data['serialNumber'])
 
 	# vm stats
-	physical_space = str( round(vmstats_data['spaceTotalGiB']/1024, 5) )
-	physical_free = str( round(vmstats_data['spaceRemainingPhysicalGiB']/1024, 5) )
-	physical_used = str( round((vmstats_data['spaceTotalGiB']-vmstats_data['spaceRemainingPhysicalGiB'])/1024, 5) )
-	logical_space = str( round((vmstats_data['spaceTotalGiB'] * vmstats_data['spaceSavingsFactor'])/1024, 5) )
-	logical_free = str( round((vmstats_data['spaceRemainingPhysicalGiB'] * vmstats_data['spaceSavingsFactor'])/1024, 5) )
-	logical_used = str( round( ((vmstats_data['spaceTotalGiB'] - vmstats_data['spaceRemainingPhysicalGiB']) * vmstats_data['spaceSavingsFactor'])/1024, 5 ) )
-	percent_used = str( round(100 - (vmstats_data['spaceRemainingPhysicalGiB'] / vmstats_data['spaceTotalGiB'] * 100), 5) )
-	saving_factor = str( round(vmstats_data['spaceSavingsFactor'], 5) )
+	physical_space = str(vmstats_data['spaceTotalGiB'])
+	physical_free = str(vmstats_data['spaceRemainingPhysicalGiB'])
+	physical_used = str(vmstats_data['spaceTotalGiB']-vmstats_data['spaceRemainingPhysicalGiB'])
+	logical_space = str(vmstats_data['spaceTotalGiB'] * vmstats_data['spaceSavingsFactor'])
+	logical_free = str(vmstats_data['spaceRemainingPhysicalGiB'] * vmstats_data['spaceSavingsFactor'])
+	logical_used = str( ((vmstats_data['spaceTotalGiB'] - vmstats_data['spaceRemainingPhysicalGiB']) * vmstats_data['spaceSavingsFactor']) )
+	percent_used = str( 100 - (vmstats_data['spaceRemainingPhysicalGiB'] / vmstats_data['spaceTotalGiB'] * 100) )
+	saving_factor = str(vmstats_data['spaceSavingsFactor'])
 	number_of_vms = str(vmstats_data['vmsCount'])
-	snapshots_on_hypervisor_gb = str( round(vmstats_data['spaceUsedSnapshotsHypervisorGiB'], 5) )
-	snapshots_on_tintri_gb = str( round(vmstats_data['spaceUsedSnapshotsTintriGiB'], 5) )
-	total_snapshots = str( round(vmstats_data['spaceUsedSnapshotsHypervisorGiB'] + vmstats_data['spaceUsedSnapshotsTintriGiB'], 5) )
+	snapshots_on_hypervisor_gb = str(vmstats_data['spaceUsedSnapshotsHypervisorGiB'])
+	snapshots_on_tintri_gb = str(vmstats_data['spaceUsedSnapshotsTintriGiB'])
+	total_snapshots = str(vmstats_data['spaceUsedSnapshotsHypervisorGiB'] + vmstats_data['spaceUsedSnapshotsTintriGiB'])
 
 	# check if we're doing UPLOAD to Splunk or just CSV write out
 	if not arguments.args.csv_only:
@@ -236,28 +236,28 @@ def parse_vmstats(vmstats:dict) -> dict:
 				"time": time.time(),
 				"event": "metric",
 				"host": server_name,
-				"source": "tintri_ta",
-				"sourcetype": "json",
+				"source": arguments.args.event_source,
+				"sourcetype": arguments.args.event_sourcetype,
 				"fields": { 
-					"Tintri_Name": server_name,
-					"Current_capacity": current_capacity,
-					"Filesystem_id": filesystem_id,
-					"Model_name": model_name,
-					"OS_Version": os_version,
-					"Product_ID": product_id,
-					"Serial_Number": serial_number,
-					"Physical_Space": physical_space,
-					"Physical_Free": physical_free,
-					"Physical_Used": physical_used,
-					"Logical_Space": logical_space,
-					"Logical_Free": logical_free,
-					"Logical_Used": logical_used,
-					"Percent_Used": percent_used,
-					"Saving_Factor": saving_factor,
-					"Number_of_VMs": number_of_vms,
-					"Snapshots_on_Hypervisor_GB": snapshots_on_hypervisor_gb,
-					"Snapshots_on_Tintri_GB": snapshots_on_tintri_gb,
-					"Total_Snapshots": total_snapshots
+					"tintri_name": server_name,
+					"current_capacity_gib": current_capacity,
+					"filesystem_id": filesystem_id,
+					"model_name": model_name,
+					"os_version": os_version,
+					"product_id": product_id,
+					"serial_number": serial_number,
+					"physical_space_gib": physical_space,
+					"physical_free_gib": physical_free,
+					"physical_used_gib": physical_used,
+					"logical_space_gib": logical_space,
+					"logical_free_gib": logical_free,
+					"logical_used_gib": logical_used,
+					"percent_used": percent_used,
+					"saving_factor": saving_factor,
+					"number_of_vms": number_of_vms,
+					"snapshots_on_hypervisor_gib": snapshots_on_hypervisor_gb,
+					"snapshots_on_tintri_gib": snapshots_on_tintri_gb,
+					"total_snapshots": total_snapshots
 				}
 			}
 		else:
@@ -265,28 +265,28 @@ def parse_vmstats(vmstats:dict) -> dict:
 			event_payload =	{
 				"time": time.time(),
 				"host": server_name,
-				"source": "tintri_ta",
-				"sourcetype": "json",
+				"source": arguments.args.event_source,
+				"sourcetype": arguments.args.event_sourcetype,
 				"event": { 
-					"Tintri_Name": server_name,
-					"Current_capacity": current_capacity,
-					"Filesystem_id": filesystem_id,
-					"Model_name": model_name,
-					"OS_Version": os_version,
-					"Product_ID": product_id,
-					"Serial_Number": serial_number,
-					"Physical_Space": physical_space,
-					"Physical_Free": physical_free,
-					"Physical_Used": physical_used,
-					"Logical_Space": logical_space,
-					"Logical_Free": logical_free,
-					"Logical_Used": logical_used,
-					"Percent_Used": percent_used,
-					"Saving_Factor": saving_factor,
-					"Number_of_VMs": number_of_vms,
-					"Snapshots_on_Hypervisor_GB": snapshots_on_hypervisor_gb,
-					"Snapshots_on_Tintri_GB": snapshots_on_tintri_gb,
-					"Total_Snapshots": total_snapshots
+					"tintri_name": server_name,
+					"current_capacity_gib": current_capacity,
+					"filesystem_id": filesystem_id,
+					"model_name": model_name,
+					"os_version": os_version,
+					"product_id": product_id,
+					"serial_number": serial_number,
+					"physical_space_gib": physical_space,
+					"physical_free_gib": physical_free,
+					"physical_used_gib": physical_used,
+					"logical_space_gib": logical_space,
+					"logical_free_gib": logical_free,
+					"logical_used_gib": logical_used,
+					"percent_used": percent_used,
+					"saving_factor": saving_factor,
+					"number_of_vms": number_of_vms,
+					"snapshots_on_hypervisor_gib": snapshots_on_hypervisor_gb,
+					"snapshots_on_tintri_gib": snapshots_on_tintri_gb,
+					"total_snapshots": total_snapshots
 				}
 			}
 
@@ -325,25 +325,25 @@ def parse_vmstats(vmstats:dict) -> dict:
 				total_snapshots
 			]],
 			header_row=[
-				"Tintri_Name",
-				"Current_capacity",
-				"Filesystem_id",
-				"Model_name",
-				"OS_Version",
-				"Product_ID",
-				"Serial_Number",
-				"Physical_Space",
-				"Physical_Free",
-				"Physical_Used",
-				"Logical_Space",
-				"Logical_Free",
-				"Logical_Used",
-				"Percent_Used",
-				"Saving_Factor",
-				"Number_of_VMs",
-				"Snapshots_on_Hypervisor_GB",
-				"Snapshots_on_Tintri_GB",
-				"Total_Snapshots"
+				"tintri_name",
+				"current_capacity_gib",
+				"filesystem_id",
+				"model_name",
+				"os_version",
+				"product_id",
+				"serial_number",
+				"physical_space_gib",
+				"physical_free_gib",
+				"physical_used_gib",
+				"logical_space_gib",
+				"logical_free_gib",
+				"logical_used_gib",
+				"percent_used",
+				"saving_factor",
+				"number_of_vms",
+				"snapshots_on_hypervisor_gib",
+				"snapshots_on_tintri_gib",
+				"total_snapshots"
 			])
 
 		if arguments.args.debug:

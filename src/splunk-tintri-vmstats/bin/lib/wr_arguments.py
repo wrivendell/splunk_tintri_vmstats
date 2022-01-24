@@ -45,6 +45,8 @@ def Arguments():
 	parser.add_argument("-pw", "--password", nargs="?", required=False, help="Tintri Device Password.")
 	parser.add_argument("-suri", "--splunk_uri", nargs="?", required=False, help="Splunk Server URI, i.e 'https://mygreatsplunkserver.com' ")
 	parser.add_argument("-hec", "--splunk_hec_token", nargs="?", required=False, help="Splunk HEC token.")
+	parser.add_argument("-es", "--event_source", nargs="?", required=False, default='tintri_ta', help="Splunk formatted event source.")
+	parser.add_argument("-est", "--event_sourcetype", nargs="?", required=False, default='json', help="Splunk formatted event sourcetype")
 	parser.add_argument("-met", "--metrics", type=str2bool, nargs="?", const=True, default=False, required=False, help="True to send the data as Metrics via HEC token.")
 	parser.add_argument("-csv", "--csv_output", type=str2bool, nargs="?", const=True, default=False, required=False, help="Write out a CSV of stats data.")
 	parser.add_argument("-csvo", "--csv_only", type=str2bool, nargs="?", const=True, default=False, required=False, help="Write out a CSV of stats data only and skip send to Splunk.")
