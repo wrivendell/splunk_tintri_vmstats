@@ -5,6 +5,7 @@
 # 	E2: contact@willrivendell.com
 ##############################################################################################################
 ### compiled python standalone (no python install required) - NOTE you may need full path to "script" file below when Splunk is running it
+./script \
     -sn 'server1.com' 'server2.com' \
     -un 'admin' \
     -pw 'password' \
