@@ -17,8 +17,8 @@
     -csvo False \
     -rc 5 \
     -d  True \
-    -ll "{$SPLUNK_HOME}/etc/apps/splunk-tintri-vmstats/logs" \
-    -csvl "{$SPLUNK_HOME}/etc/apps/splunk-tintri-vmstats/csv"
+    -ll "{$SPLUNK_HOME}/etc/apps/splunk-tintri-vmstats_lin/logs" \
+    -csvl "{$SPLUNK_HOME}/etc/apps/splunk-tintri-vmstats_lin/csv"
 
 # You should always try and use this version as it doesn't need any outside dependencies
 # \  = indicates cmd continues on next line in bash
