@@ -12,7 +12,7 @@ from lib import wr_arguments as arguments
 
 ### Globals ###########################################
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning) # disables the nagging insecure warning, we know we're hitting our own splunk servers so we dont care
-log_file = log.LogFile('splunk_tintri_ta', remove_old_logs=True, log_level=1, log_retention_days=0, debug=False)
+log_file = log.LogFile('splunk_tintri_ta', log_folder=arguments.args.log_location, remove_old_logs=True, log_level=1, log_retention_days=0, debug=False)
 if arguments.args.debug:
 	print("TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Log file created in ./logs/\n\n")
 tintri_session_id = ''
@@ -300,7 +300,7 @@ def parse_vmstats(vmstats:dict) -> dict:
 		log_file.writeLinesToFile(["TINTRI_TA(" + str(sys._getframe().f_lineno) +"): Writing CSV Output as requested."])
 
 		# create a wr_logging class for the CSV file
-		event_csv = log.CSVFile("vmstats.csv", log_folder='./csv/', remove_old_logs=True, log_retention_days=arguments.args.retain_csv, prefix_date=True, debug=False)
+		event_csv = log.CSVFile("vmstats.csv", log_folder=arguments.args.csv_location, remove_old_logs=True, log_retention_days=arguments.args.retain_csv, prefix_date=True, debug=False)
 
 		# create the row of values to write and the header row
 		event_csv.writeLinesToCSV([[

@@ -160,7 +160,7 @@ class LogFile():
 					retry = 0
 					checkFileSize(self.log_path, self.roll_size_bytes, self.max_files_to_keep, self.debug)
 				except Exception as ex:
-					print("- WRLog(" + str(sys._getframe().f_lineno) +") (" + self.log_file + "): Exception: + " + str(ex) + " -")
+					print("- WRLog(" + str(sys._getframe().f_lineno) +") (" + self.log_file + "): Exception: " + str(ex) + " -")
 					if retry > 0:
 						print("Retrying write: " + (retry))
 						time.sleep(0.1)

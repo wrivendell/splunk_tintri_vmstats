@@ -4,8 +4,7 @@
 # 	E1: wrivendell@splunk.com
 # 	E2: contact@willrivendell.com
 ##############################################################################################################
-### compiled python standalone (no python install required)
-./script \
+### compiled python standalone (no python install required) - NOTE you may need full path to "script" file below when Splunk is running it
     -sn 'server1.com' 'server2.com' \
     -un 'admin' \
     -pw 'password' \
@@ -17,7 +16,9 @@
     -csv True \
     -csvo False \
     -rc 5 \
-    -d  True
+    -d  True \
+    -ll "{$SPLUNK_HOME}/etc/apps/splunk-tintri-vmstats/logs" \
+    -csvl "{$SPLUNK_HOME}/etc/apps/splunk-tintri-vmstats/csv"
 
 # You should always try and use this version as it doesn't need any outside dependencies
 # \  = indicates cmd continues on next line in bash
@@ -33,3 +34,5 @@
 # -csvo = --csv_only - Write out a CSV of stats data only and skip send to Splunk
 # -rc = --retain_csv - Number of days to retain CSV outputs (csvs older than this number of days will be auto removed next run)
 # -d  = --debug - Enable more console debugging
+# -ll = --log_location - full path to where to store the logs, i.e '/opt/splunk/var/log/tintri_ta' or "{$SPLUNK_HOME}/etc/apps/splunk-tintri-vmstats/logs" - use double quotes and {} if using $SPLUNK_HOME
+# -csvl = --csv_location - full path to where to store the logs, i.e '/opt/splunk/var/log/tintri_ta/csv' or "{$SPLUNK_HOME}/etc/apps/splunk-tintri-vmstats/csv" - use double quotes and {} if using $SPLUNK_HOME

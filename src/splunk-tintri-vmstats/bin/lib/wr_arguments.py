@@ -53,6 +53,8 @@ def Arguments():
 	parser.add_argument("-rc", "--retain_csv", type=checkPositive, nargs="?", const=True, default=False, required=False, help="How many days to retain the CSV events, days beyond the number specified here will be deleted.")
 	parser.add_argument("-d", "--debug", type=str2bool, nargs="?", const=True, default=False, required=False, help="Enable extra console logging for troubleshooting of confirmation testing.")
 	parser.add_argument("-dm", "--debug_modules", type=str2bool, nargs="?", const=True, default=False, required=False, help="Will enable deep level debug on all the modules that make up the script. Enable if getting errors, to help dev pinpoint.")
+	parser.add_argument("-ll", "--log_location", nargs="?", required=False, Default='./logs', help="Full path to where the log file will be written.")
+	parser.add_argument("-csvl", "--csv_location", nargs="?", required=False, Default='./csv', help="Full path to where the csv file will be written.")
 
 ############## RUNTIME
 Arguments()
