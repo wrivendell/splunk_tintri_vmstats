@@ -36,4 +36,4 @@ python3 script.py \
 # -rc = --retain_csv - Number of days to retain CSV outputs (csvs older than this number of days will be auto removed next run)
 # -d  = --debug - Enable more console debugging
 # -ll = --log_location - full path to where to store the logs, i.e '/opt/splunk/var/log/tintri_ta' or "{$SPLUNK_HOME}/etc/apps/splunk-tintri-vmstats/logs" - use double quotes and {} if using $SPLUNK_HOME
-# -csvl = --csv_location - full path to where to store the logs, i.e '/opt/splunk/var/log/tintri_ta/csv' or "{$SPLUNK_HOME}/etc/apps/splunk-tintri-vmstats/csv" - use double quotes and {} if using $SPLUNK_HOME
+# -csvl = --csv_location - full path to where to store the csvs, i.e '/opt/splunk/var/log/tintri_ta/csv' or "{$SPLUNK_HOME}/etc/apps/splunk-tintri-vmstats/csv" - use double quotes and {} if using $SPLUNK_HOME
